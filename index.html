@@ -435,7 +435,7 @@
     });
 
     const activeItem = document.querySelectorAll('.playlist-item')[index];
-    if (activeItem) activeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    
   }
 
   function nextVideo() { if (current < videos.length - 1) loadVideo(current + 1); }
@@ -457,6 +457,10 @@
   });
 
   loadVideo(0);
+
+  // Toujours remonter en haut
+  history.scrollRestoration = "manual";
+  window.scrollTo(0, 0);
 
   // QR Code
   const PAGE_URL = window.location.href !== 'about:blank'
