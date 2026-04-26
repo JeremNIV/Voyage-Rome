@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Voyage à Rome</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #f7f4ef;
+      --warm: #e8e0d4;
+      --stone: #b5a898;
+      --ink: #2a2420;
+      --gold: #c9a96e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,169,110,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(181,168,152,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-weight: 200;
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(3rem, 10vw, 6.5rem);
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-title em { font-style: italic; color: var(--gold); }
+
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      color: var(--stone);
+      margin-bottom: 2.5rem;
+    }
+
+    .divider {
+      width: 40px; height: 1px;
+      background: var(--gold);
+      margin: 0 auto 2.5rem;
+      opacity: 0.7;
+    }
+
+    .hero-desc {
+      max-width: 420px;
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: var(--stone);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--stone);
+      opacity: 0.6;
+      animation: float 2.5s ease-in-out infinite;
+    }
+
+    .scroll-hint::after {
+      content: '';
+      display: block;
+      width: 1px; height: 30px;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── SECTION ── */
+    .section {
+      padding: 6rem 2rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 300;
+      color: var(--ink);
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+
+    /* ── ONGLETS ── */
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--warm);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      padding: 0.8rem 1.8rem;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--stone);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn:hover { color: var(--ink); }
+
+    .tab-btn.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── LECTEUR ── */
+    .player-wrapper {
+      background: #fff;
+      border: 1px solid var(--warm);
+      overflow: hidden;
+    }
+
+    .player-screen {
+      position: relative;
+      aspect-ratio: 16/9;
+      background: var(--ink);
+    }
+
+    .player-screen iframe {
+      width: 100%; height: 100%;
+      border: none; display: block;
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1rem 1.5rem 0.6rem;
+      border-bottom: 1px solid var(--warm);
+    }
+
+    .player-num {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .player-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    .player-controls {
+      display: flex;
+      gap: 1rem;
+      padding: 0.8rem 1.5rem 1rem;
+    }
+
+    .player-controls button {
+      background: none;
+      border: 1px solid var(--warm);
+      color: var(--stone);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      padding: 0.5rem 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .player-controls button:hover:not(:disabled) {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .player-controls button:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    /* ── PLAYLIST ── */
+    .playlist {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .playlist-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1.2rem;
+      background: #fff;
+      border: 1px solid var(--warm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .playlist-item:hover { border-color: var(--gold); }
+
+    .playlist-item.active {
+      border-color: var(--gold);
+      background: #fffdf9;
+    }
+
+    .pl-num {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--stone);
+      min-width: 22px;
+    }
+
+    .playlist-item.active .pl-num { color: var(--gold); }
+
+    .pl-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--warm);
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .playlist-item.active .pl-dot { background: var(--gold); }
+
+    .pl-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+
+    .pl-play {
+      margin-left: auto;
+      font-size: 0.6rem;
+      color: var(--stone);
+      letter-spacing: 0.1em;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .playlist-item:hover .pl-play,
+    .playlist-item.active .pl-play {
+      opacity: 1;
+      color: var(--gold);
+    }
+
+    /* ── QR SECTION ── */
+    .qr-section {
+      background: var(--ink);
+      padding: 6rem 2rem;
+      text-align: center;
+    }
+
+    .qr-section .section-label { color: var(--gold); margin-bottom: 1rem; }
+
+    .qr-section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 300;
+      color: var(--cream);
+      margin-bottom: 1rem;
+    }
+
+    .qr-section p {
+      color: var(--stone);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      max-width: 360px;
+      margin: 0 auto 3rem;
+    }
+
+    .qr-box {
+      display: inline-block;
+      background: var(--cream);
+      padding: 1.8rem;
+      position: relative;
+    }
+
+    .qr-box::before, .qr-box::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border-color: var(--gold);
+      border-style: solid;
+    }
+
+    .qr-box::before { top: -4px; left: -4px; border-width: 2px 0 0 2px; }
+    .qr-box::after  { bottom: -4px; right: -4px; border-width: 0 2px 2px 0; }
+
+    #qrcode { display: flex; justify-content: center; }
+    #qrcode canvas, #qrcode img { display: block; }
+
+    .qr-url {
+      margin-top: 2rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--stone);
+    }
+
+    footer {
+      padding: 2.5rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--stone);
+      letter-spacing: 0.15em;
+      border-top: 1px solid var(--warm);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <p class="hero-eyebrow">Souvenirs en mouvement</p>
+  <h1 class="hero-title">Voyage à <em>Rome</em></h1>
+  <p class="hero-sub">Les moments qu'on ne peut pas mettre en photo</p>
+  <div class="divider"></div>
+  <p class="hero-desc">Une collection de vidéos pour revivre chaque instant.</p>
+  <div class="scroll-hint">Voir les vidéos</div>
+</section>
+
+<!-- ══ SECTION VIDÉOS ══ -->
+<section class="section">
+  <p class="section-label">Galerie vidéo</p>
+  <h2 class="section-title">Nos moments à Rome</h2>
+
+  <!-- Onglets -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('bus')">🚌 Tour de Rome en bus</button>
+    <button class="tab-btn" onclick="switchTab('general')">🎥 Rome en général</button>
+  </div>
+
+  <!-- Onglet 1 : Tour de Rome en bus -->
+  <div class="tab-panel active" id="tab-bus">
+    <div class="player-wrapper">
+      <div class="player-screen">
+        <iframe id="playerBus" src="" allowfullscreen></iframe>
+      </div>
+      <div class="player-info">
+        <span class="player-num" id="numBus">01 / 17</span>
+        <span class="player-title" id="titleBus"></span>
+      </div>
+      <div class="player-controls">
+        <button onclick="prev('bus')" id="prevBus" disabled>← Précédente</button>
+        <button onclick="next('bus')" id="nextBus">Suivante →</button>
+      </div>
+    </div>
+    <div class="playlist" id="playlistBus"></div>
+  </div>
+
+  <!-- Onglet 2 : Rome en général -->
+  <div class="tab-panel" id="tab-general">
+    <div class="player-wrapper">
+      <div class="player-screen">
+        <iframe id="playerGeneral" src="" allowfullscreen></iframe>
+      </div>
+      <div class="player-info">
+        <span class="player-num" id="numGeneral">01 / 05</span>
+        <span class="player-title" id="titleGeneral"></span>
+      </div>
+      <div class="player-controls">
+        <button onclick="prev('general')" id="prevGeneral" disabled>← Précédente</button>
+        <button onclick="next('general')" id="nextGeneral">Suivante →</button>
+      </div>
+    </div>
+    <div class="playlist" id="playlistGeneral"></div>
+  </div>
+</section>
+
+<!-- ══ QR CODE ══ -->
+<div class="qr-section">
+  <p class="section-label">Accès rapide</p>
+  <h2 class="qr-section-title">Scannez pour accéder aux vidéos</h2>
+
+  <div class="qr-box">
+    <div id="qrcode"></div>
+  </div>
+  <p class="qr-url" id="qrUrl">https://jeremNIV.github.io/Voyage-Rome</p>
+</div>
+
+<footer>
+  &copy; Voyage à Rome &nbsp;·&nbsp; Tous droits réservés
+</footer>
+
+<script>
+  history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
+  const data = {
+    bus: {
+      videos: [
+        { id: '1kri98XjYZsXqEQPuZMjtAfqKE7ZxY4TS', titre: 'Le Colisée en 0.5' },
+        { id: '1EfMpiXG1KBHapQJCei_bW50tZ7k-0MWv',  titre: 'Tour du Colisée' },
+        { id: '1MIs8H4qObCXxisbM9wg_a5mmYuYbc7Jv',  titre: 'Forum Romain' },
+        { id: '1BaVMBTMO89VEAGOeGEn8dcD_DNsFs_2C',  titre: 'Place du Capitol' },
+        { id: '1J6BcShMLEG9wrqyiQ6MqkuOpnDR6IgOf',  titre: 'Monument de Victor-Emmanuel II' },
+        { id: '1T1ftHXNnrU1Sduxk8LJ4UGD9JKvssf5_',  titre: 'Église Nuova & oratoire/palais des Philippins' },
+        { id: '1Se0uhL0NKWcIbS0UL0An6bsQ655Y_kTM',  titre: 'Château Sant Angelo 1' },
+        { id: '1hYn4Xl5AyiglZR4aLToe1ZK61G4e5ylZ',  titre: 'Château Sant Angelo 2' },
+        { id: '1sSbNkUz-3lEtxn2-WFxnr_sAWGq15_Na',  titre: 'Église Sant Rocco' },
+        { id: '1JR58Jf-92YXqQIn_f12GFn7aOsBEVDG-',  titre: 'Hotel Excelsior' },
+        { id: '1Qzpt8YwG-dHTLo2SIw92tymhFQs-LVwq',  titre: 'Hotel/restaurant Bernini' },
+        { id: '1XtGGHZwLf2YoiUbXm_ZmKaZaYZjQ0LjW',  titre: 'Fontaine dell Acqua Felice' },
+        { id: '1dYdq6DEuta8u6I5d3fnHtxF23GDP3JxB',  titre: 'Place de la République 1' },
+        { id: '1L0PJSUlCrEaQ8P9AM3amoGFSNOIiM5-I',  titre: 'Place de la République 2' },
+        { id: '1-EoWhmyh7hWj2gHgaQCZCWtG_3JW6fj5',  titre: 'Architecture de maison 1' },
+        { id: '14k_TOxSatm3OM_ABRD5_9F-8d6Lgi5WJ',  titre: 'Architecture de maison 2' },
+        { id: '177Q-wlLZ8ePJMlVGpwF4Sj7ef8LuRRep',  titre: 'Basilique du Sacré-Cœur de Jésus' },
+      ],
+      current: 0
+    },
+    general: {
+      videos: [
+        { id: '1pAQ3ep8yxY6z1GueXiaxHb-eQXnOSpWG', titre: 'Pâtes faites à la main' },
+        { id: '1u5v-_EF2Hw-COS-EGdJ7wMuiiT_IlsHy', titre: 'Saxophone dans les jardins de la Villa Borghese' },
+        { id: '12-8Mqt_YnOMUuueiEP_ZjaioovcaUzaS',  titre: 'Terme de Caracalla' },
+        { id: '1wNjcCv_5PPwLxMogbm8SwQ4Zh6wtocCk',  titre: 'Trou de la serrure' },
+        { id: '1AWReV3Y4B8iFmTrmH4ajQiUgtVgj61DP',  titre: 'Première rencontre avec le président' },
+      ],
+      current: 0
+    }
+  };
+
+  function buildPlaylist(tab) {
+    const d = data[tab];
+    const container = document.getElementById('playlist' + capitalize(tab));
+    container.innerHTML = '';
+    d.videos.forEach((v, i) => {
+      const item = document.createElement('div');
+      item.className = 'playlist-item' + (i === d.current ? ' active' : '');
+      item.innerHTML = `
+        <span class="pl-num">${String(i + 1).padStart(2, '0')}</span>
+        <span class="pl-dot"></span>
+        <span class="pl-title">${v.titre}</span>
+        <span class="pl-play">▶ Lire</span>
+      `;
+      item.addEventListener('click', () => loadVideo(tab, i));
+      container.appendChild(item);
+    });
+  }
+
+  function loadVideo(tab, index) {
+    const d = data[tab];
+    d.current = index;
+    const v = d.videos[index];
+    const cap = capitalize(tab);
+
+    document.getElementById('player' + cap).src =
+      'https://drive.google.com/file/d/' + v.id + '/preview';
+    document.getElementById('num' + cap).textContent =
+      String(index + 1).padStart(2, '0') + ' / ' + d.videos.length;
+    document.getElementById('title' + cap).textContent = v.titre;
+    document.getElementById('prev' + cap).disabled = index === 0;
+    document.getElementById('next' + cap).disabled = index === d.videos.length - 1;
+
+    document.querySelectorAll('#playlist' + cap + ' .playlist-item').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+  }
+
+  function next(tab) {
+    const d = data[tab];
+    if (d.current < d.videos.length - 1) loadVideo(tab, d.current + 1);
+  }
+
+  function prev(tab) {
+    const d = data[tab];
+    if (d.current > 0) loadVideo(tab, d.current - 1);
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', (i === 0 && tab === 'bus') || (i === 1 && tab === 'general'));
+    });
+    document.getElementById('tab-bus').classList.toggle('active', tab === 'bus');
+    document.getElementById('tab-general').classList.toggle('active', tab === 'general');
+  }
+
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // Init
+  buildPlaylist('bus');
+  buildPlaylist('general');
+  loadVideo('bus', 0);
+  loadVideo('general', 0);
+
+  // QR Code
+  const PAGE_URL = window.location.href !== 'about:blank'
+    ? window.location.href
+    : 'https://jeremNIV.github.io/Voyage-Rome';
+
+  document.getElementById('qrUrl').textContent = PAGE_URL;
+
+  new QRCode(document.getElementById('qrcode'), {
+    text: PAGE_URL,
+    width: 180,
+    height: 180,
+    colorDark: '#2a2420',
+    colorLight: '#f7f4ef',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+</script>
+</body>
+</html>
